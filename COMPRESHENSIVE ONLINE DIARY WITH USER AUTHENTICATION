@@ -1,0 +1,197 @@
+import os
+import datetime
+
+DIARY_FILE = 'diary.txt'
+BACKUP_FILE = 'diary_backup.txt'
+PASSWORD = '1234'  # Set your numeric password here
+
+
+def write_entry():
+    date_str = input("Enter the date (YYYY-MM-DD) or press Enter for today: ")
+    if not date_str:
+        date_str = datetime.datetime.now().strftime("%Y-%m-%d")
+
+    print("Enter your diary entry. Type 'END' on a new line to finish.")
+    entry_lines = []
+    while True:
+        line = input()
+        if line == 'END':
+            break
+        entry_lines.append(line)
+
+    entry_text = "\n".join(entry_lines)
+
+    with open(DIARY_FILE, 'a') as file:
+        file.write(f"{date_str}\n")
+        file.write(f"{entry_text}\n")
+        file.write("-" * 40 + "\n")
+
+    print("Entry saved.")
+
+
+def view_entries():
+    if not os.path.exists(DIARY_FILE):
+        print("No diary entries found.")
+        return
+
+    with open(DIARY_FILE, 'r') as file:
+        content = file.read()
+
+    print("Diary Entries:\n")
+    print(content)
+
+
+def search_entries():
+    keyword = input("Enter a keyword to search: ")
+    if not os.path.exists(DIARY_FILE):
+        print("No diary entries found.")
+        return
+
+    with open(DIARY_FILE, 'r') as file:
+        entries = file.read().split("-" * 40 + "\n")
+
+    found = False
+    for entry in entries:
+        if keyword.lower() in entry.lower():
+            print(entry)
+            found = True
+
+    if not found:
+        print("No entries found with the given keyword.")
+
+
+def delete_entry():
+    date_str = input("Enter the date of the entry to delete (YYYY-MM-DD): ")
+    if not os.path.exists(DIARY_FILE):
+        print("No diary entries found.")
+        return
+
+    with open(DIARY_FILE, 'r') as file:
+        entries = file.read().split("-" * 40 + "\n")
+
+    new_entries = [entry for entry in entries if not entry.startswith(date_str)]
+    if len(new_entries) == len(entries):
+        print("No entries found for the given date.")
+    else:
+        with open(DIARY_FILE, 'w') as file:
+            for entry in new_entries:
+                if entry.strip():  # Avoid writing empty entries
+                    file.write(entry + "-" * 40 + "\n")
+        print("Entry deleted.")
+
+
+def edit_entry():
+    date_str = input("Enter the date of the entry to edit (YYYY-MM-DD): ")
+    if not os.path.exists(DIARY_FILE):
+        print("No diary entries found.")
+        return
+
+    with open(DIARY_FILE, 'r') as file:
+        entries = file.read().split("-" * 40 + "\n")
+
+    for i, entry in enumerate(entries):
+        if entry.startswith(date_str):
+            print("Current entry:")
+            print(entry)
+            print("Enter the new text for the entry. Type 'END' on a new line to finish.")
+            entry_lines = []
+            while True:
+                line = input()
+                if line == 'END':
+                    break
+                entry_lines.append(line)
+
+            new_entry_text = "\n".join(entry_lines)
+            entries[i] = f"{date_str}\n{new_entry_text}"
+            with open(DIARY_FILE, 'w') as file:
+                for e in entries:
+                    if e.strip():  # Avoid writing empty entries
+                        file.write(e + "-" * 40 + "\n")
+            print("Entry updated.")
+            return
+
+    print("No entries found for the given date.")
+
+
+def export_entries():
+    export_file = input("Enter the file name to export entries to (e.g., export.txt): ")
+    if not os.path.exists(DIARY_FILE):
+        print("No diary entries found.")
+        return
+
+    with open(DIARY_FILE, 'r') as file:
+        content = file.read()
+
+    with open(export_file, 'w') as file:
+        file.write(content)
+
+    print(f"Entries exported to {export_file}.")
+
+
+def backup_entries():
+    if not os.path.exists(DIARY_FILE):
+        print("No diary entries found.")
+        return
+
+    with open(DIARY_FILE, 'r') as file:
+        content = file.read()
+
+    with open(BACKUP_FILE, 'w') as file:
+        file.write(content)
+
+    print(f"Backup created in {BACKUP_FILE}.")
+
+
+def authenticate():
+    attempts = 3
+    while attempts > 0:
+        password = input("Enter the password: ")
+        if password == PASSWORD:
+            return True
+        else:
+            attempts -= 1
+            print(f"Incorrect password. {attempts} attempts left.")
+
+    print("Authentication failed. Exiting...")
+    return False
+
+
+def main():
+    if not authenticate():
+        return
+
+    while True:
+        print("\nPersonal Diary")
+        print("1. Write a new entry")
+        print("2. View all entries")
+        print("3. Search entries")
+        print("4. Delete an entry")
+        print("5. Edit an entry")
+        print("6. Export entries")
+        print("7. Backup entries")
+        print("8. Quit")
+
+        choice = input("Choose an option: ")
+        if choice == '1':
+            write_entry()
+        elif choice == '2':
+            view_entries()
+        elif choice == '3':
+            search_entries()
+        elif choice == '4':
+            delete_entry()
+        elif choice == '5':
+            edit_entry()
+        elif choice == '6':
+            export_entries()
+        elif choice == '7':
+            backup_entries()
+        elif choice == '8':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+
+if __name__ == "__main__":
+    main()
