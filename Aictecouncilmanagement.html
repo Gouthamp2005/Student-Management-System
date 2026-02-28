@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AICTE Counseling System</title>
+
+<style>
+
+/* EDUCATION BACKGROUND */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(rgba(0,0,50,0.7), rgba(0,0,50,0.7)),
+    url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1');
+    background-size: cover;
+    background-attachment: fixed;
+    color: white;
+}
+
+/* HEADER */
+h1 {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(90deg, #003366, #0059b3);
+    animation: slideDown 1s ease;
+}
+
+/* MAIN CARD */
+.container {
+    width: 85%;
+    max-width: 900px;
+    margin: 30px auto;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+}
+
+/* FLOATING INPUT STYLE */
+.input-group {
+    position: relative;
+    margin: 20px 0;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    outline: none;
+    background: transparent;
+    border-bottom: 2px solid white;
+    color: white;
+    font-size: 16px;
+}
+
+.input-group label {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    transition: 0.3s;
+    color: #ccc;
+}
+
+.input-group input:focus + label,
+.input-group input:valid + label {
+    top: -10px;
+    font-size: 13px;
+    color: #00ccff;
+}
+
+/* BUTTON STYLE */
+button {
+    padding: 12px 20px;
+    margin: 10px 5px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    background: linear-gradient(45deg, #00ccff, #0066ff);
+    color: white;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 15px #00ccff;
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.2);
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid white;
+}
+
+th {
+    background: #003366;
+}
+
+/* ANIMATION */
+@keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>AICTE Counseling Management System</h1>
+
+<div class="container">
+
+    <h3>Register Candidate</h3>
+
+    <div class="input-group">
+        <input type="text" id="name" required>
+        <label>Enter Candidate Name</label>
+    </div>
+
+    <div class="input-group">
+        <input type="text" id="course" required>
+        <label>Preferred Course</label>
+    </div>
+
+    <button onclick="register()">Register</button>
+    <button onclick="conductExam()">Conduct Entrance Exam</button>
+    <button onclick="admitCandidates()">Admit Candidates</button>
+    <button onclick="displayResults()">Display Results</button>
+
+    <div id="output"></div>
+
+</div>
+
+<script>
+
+let candidates = [];
+
+let colleges = [
+    {
+        name: "KSR College",
+        approved: true,
+        courses: [
+            { name: "CSE", min: 60, max: 100, seats: 2, admitted: 0 },
+            { name: "IT", min: 65, max: 100, seats: 2, admitted: 0 }
+        ]
+    }
+];
+
+function register() {
+    let name = document.getElementById("name").value;
+    let course = document.getElementById("course").value;
+
+    if (name === "" || course === "") {
+        alert("Please fill all fields");
+        return;
+    }
+
+    candidates.push({
+        id: candidates.length + 1,
+        name: name,
+        selectedCourse: course,
+        score: 0,
+        status: "Not Admitted"
+    });
+
+    alert("Candidate Registered Successfully!");
+}
+
+function conductExam() {
+    candidates.forEach(c => {
+        c.score = (50 + Math.random() * 30).toFixed(2);
+    });
+
+    alert("Entrance Exam Conducted!");
+}
+
+function admitCandidates() {
+    candidates.forEach(c => {
+
+        for (let college of colleges) {
+            if (!college.approved) continue;
+
+            for (let course of college.courses) {
+
+                if (c.score >= course.min &&
+                    c.score <= course.max &&
+                    course.admitted < course.seats &&
+                    c.status === "Not Admitted") {
+
+                    c.status = "Admitted";
+                    course.admitted++;
+                    break;
+                }
+            }
+        }
+    });
+
+    alert("Admission Process Completed!");
+}
+
+function displayResults() {
+
+    let output = "<table>";
+    output += "<tr><th>ID</th><th>Name</th><th>Course</th><th>Score</th><th>Status</th></tr>";
+
+    candidates.forEach(c => {
+        output += `<tr>
+            <td>${c.id}</td>
+            <td>${c.name}</td>
+            <td>${c.selectedCourse}</td>
+            <td>${c.score}</td>
+            <td>${c.status}</td>
+        </tr>`;
+    });
+
+    output += "</table>";
+
+    document.getElementById("output").innerHTML = output;
+}
+
+</script>
+
+</body>
+</html>
